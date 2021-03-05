@@ -1,3 +1,6 @@
 [submodule "scripts/data/z3"]
 	path = scripts/data/z3
 	url = https://github.com/Z3Prover/z3
+[submodule "src/cryptominisat"]
+	path = src/cryptominisat
+	url = https://github.com/msoos/cryptominisat.git
