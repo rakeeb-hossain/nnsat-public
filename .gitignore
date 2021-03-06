@@ -1,1 +1,6 @@
 env/
+
+benchmarks/crafted16/
+benchmarks/crypto/
+benchmarks/sc2020/
+benchmarks/crypto-encoding

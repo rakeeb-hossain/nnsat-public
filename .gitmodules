@@ -4,3 +4,6 @@
 [submodule "src/cryptominisat"]
 	path = src/cryptominisat
 	url = https://github.com/msoos/cryptominisat.git
+[submodule "benchmarks/SAT-encoding"]
+	path = benchmarks/SAT-encoding
+	url = https://github.com/saeednj/SAT-encoding
