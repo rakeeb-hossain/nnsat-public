@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 1. SATCOMP 2020 Main benchmarks
-if false; then
+if true; then
 echo "=============================GENERATING SATCOMP2020============================"
 mkdir -p sc2020
 cd sc2020
@@ -45,7 +45,7 @@ cd ..
 fi
 
 # 3. Hard combinatorial benchmarks
-if true; then
+if false; then
 echo "===========================GENERATING COMBINATORIAL============================="
 
 wget -q --show-progress "https://baldur.iti.kit.edu/sat-competition-2016/downloads/crafted16.zip"

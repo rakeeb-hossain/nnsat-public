@@ -4,3 +4,8 @@ benchmarks/crafted16/
 benchmarks/crypto/
 benchmarks/sc2020/
 benchmarks/crypto-encoding
+
+src/glucose4.2.1/sources/simp/glucose
+*.swp
+*.o
+*.zip

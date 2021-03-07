@@ -400,6 +400,9 @@ Var Solver::newVar(bool sign, bool dvar) {
     trail.capacity(v + 1);
     setDecisionVar(v, dvar);
 
+	// RKB:
+	learnt_var_count.push(0);
+
 
     return v;
 }
@@ -1459,6 +1462,12 @@ lbool Solver::search(int nof_conflicts) {
         CRef confl = propagate();
 
         if(confl != CRef_Undef) {
+			// RKB: bump global variable learnt clause count
+			const Clause &c = ca[confl];
+			for (int i = 0; i < c.size(); ++i) {
+				learnt_var_count[c[i]]++;
+			}
+
             newDescent = false;
             if(parallelJobIsFinished())
                 return l_Undef;
@@ -1705,7 +1714,6 @@ double Solver::luby(double y, int x) {
 
 lbool Solver::solve_(bool do_simp, bool turn_off_simp) // Parameters are useless in core but useful for SimpSolver....
 {
-
     if(incremental && certifiedUNSAT) {
         printf("Can not use incremental and certified unsat in the same time\n");
         exit(-1);
