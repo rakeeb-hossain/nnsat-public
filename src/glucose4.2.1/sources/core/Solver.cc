@@ -55,6 +55,7 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 #include "core/Constants.h"
 #include"simp/SimpSolver.h"
 
+#define RKB 1
 
 using namespace Glucose;
 
@@ -198,6 +199,7 @@ verbosity(0)
 , nbUnsatCalls(0)
         // simplify
 , performLCM(1)
+, refocus_time(100)		// RKB
 {
     MYFLAG = 0;
     // Initialize only first time. Useful for incremental solving (not in // version), useless otherwise
@@ -286,6 +288,7 @@ Solver::Solver(const Solver &s) :
 , nbSatCalls(s.nbSatCalls)
 , nbUnsatCalls(s.nbUnsatCalls)
 , performLCM(s.performLCM)
+, refocus_time(s.refocus_time) // RKB
 {
     // Copy clauses.
     s.ca.copyTo(ca);
@@ -1489,10 +1492,11 @@ lbool Solver::search(int nof_conflicts) {
 			for (int i = 0; i < c.size(); ++i) {
 				learnt_var_count[var(c[i])]++;
 			}
-			if (conflicts % 100 == 0) {
+			if (conflicts == refocus_time) {
 				for (int i = 0; i < learnt_var_count.size(); ++i) {
 					varBumpActivity(i,learnt_var_count[i]*var_inc);
 				}
+				refocus_time <<= 1;
 			}
 #endif
 
