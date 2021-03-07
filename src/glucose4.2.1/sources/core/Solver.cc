@@ -55,6 +55,7 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 #include "core/Constants.h"
 #include"simp/SimpSolver.h"
 
+
 using namespace Glucose;
 
 
@@ -314,12 +315,14 @@ Solver::Solver(const Solver &s) :
     s.learnts.memCopyTo(learnts);
     s.permanentLearnts.memCopyTo(permanentLearnts);
     s.permanentLearntsReduced.memCopyTo(permanentLearntsReduced);
+	// RKB
+	s.learnt_var_count.memCopyTo(learnt_var_count);
 
     s.lbdQueue.copyTo(lbdQueue);
     s.trailQueue.copyTo(trailQueue);
     s.forceUNSAT.copyTo(forceUNSAT);
     s.stats.copyTo(stats);
-
+	
 
 }
 
@@ -1462,12 +1465,6 @@ lbool Solver::search(int nof_conflicts) {
         CRef confl = propagate();
 
         if(confl != CRef_Undef) {
-			// RKB: bump global variable learnt clause count
-			const Clause &c = ca[confl];
-			for (int i = 0; i < c.size(); ++i) {
-				learnt_var_count[c[i]]++;
-			}
-
             newDescent = false;
             if(parallelJobIsFinished())
                 return l_Undef;
@@ -1484,6 +1481,20 @@ lbool Solver::search(int nof_conflicts) {
             conflictsRestarts++;
             if(conflicts % 5000 == 0 && var_decay < max_var_decay)
                 var_decay += 0.01;
+			
+			// RKB: bump global variable learnt clause count
+#ifdef RKB
+			const Clause &c = ca[confl];
+
+			for (int i = 0; i < c.size(); ++i) {
+				learnt_var_count[var(c[i])]++;
+			}
+			if (conflicts % 100 == 0) {
+				for (int i = 0; i < learnt_var_count.size(); ++i) {
+					varBumpActivity(i,learnt_var_count[i]*var_inc);
+				}
+			}
+#endif
 
             if(verbosity >= 1 && starts>0 && conflicts % verbEveryConflicts == 0) {
                 printf("c | %8d   %7d    %5d | %7d %8d %8d | %5d %8d   %6d %8d | %6.3f %% |\n",

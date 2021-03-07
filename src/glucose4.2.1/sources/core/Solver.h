@@ -360,7 +360,7 @@ protected:
     vec<unsigned int>   permDiff;           // permDiff[var] contains the current conflict number... Used to count the number of  LBD
 
 	// RKB state:
-	vec<int> 			learnt_var_count;
+	vec<unsigned int>		 	learnt_var_count;
 
     // UPDATEVARACTIVITY trick (see competition'09 companion paper)
     vec<Lit> lastDecisionLevel;
