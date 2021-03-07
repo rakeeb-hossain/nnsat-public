@@ -55,7 +55,6 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 #include "core/Constants.h"
 #include"simp/SimpSolver.h"
 
-#define RKB 1
 
 using namespace Glucose;
 
@@ -1496,7 +1495,9 @@ lbool Solver::search(int nof_conflicts) {
 				for (int i = 0; i < learnt_var_count.size(); ++i) {
 					varBumpActivity(i,learnt_var_count[i]*var_inc);
 				}
+#ifdef RKB_MULT
 				refocus_time <<= 1;
+#endif
 			}
 #endif
 

@@ -31,7 +31,7 @@ echo "=============================GENERATING CRYPTO============================
 mkdir -p crypto
 cd crypto
 
-ROUNDS=21
+ROUNDS=20
 NUM_INSTANCES=50
 CTR=1
 

@@ -19,6 +19,7 @@ echo "=============================SC2020 Benchmark=============================
 rm temp.txt
 
 for cnf_file in benchmarks/sc2020/*.cnf; do
+	echo "Running $cnf_file..."
 	$exec < $cnf_file 2> /dev/null | tail -3 | head -1 | awk '{print $5}' >> temp.txt
 	tail -1 < temp.txt
 done
@@ -35,7 +36,8 @@ echo "=============================Crypto Benchmark=============================
 rm temp.txt
 
 for cnf_file in benchmarks/crypto/*.cnf; do
-	$exec < $cnf_file 2> /dev/null | tail -3 | head -1 | awk '{print $5}' >> temp.txt 
+	echo "Running $cnf_file..."
+	$exec < $cnf_file | tail -3 | head -1 | awk '{print $5}' >> temp.txt 
 	tail -1 < temp.txt
 done
 
