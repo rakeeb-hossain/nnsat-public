@@ -55,6 +55,8 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 #include "core/Constants.h"
 #include"simp/SimpSolver.h"
 
+#define RKB 1
+#define RKB_MULT 1
 
 using namespace Glucose;
 
@@ -1483,7 +1485,7 @@ lbool Solver::search(int nof_conflicts) {
             conflictsRestarts++;
             if(conflicts % 5000 == 0 && var_decay < max_var_decay)
                 var_decay += 0.01;
-			
+	/*		
 			// RKB: bump global variable learnt clause count
 #ifdef RKB
 			const Clause &c = ca[confl];
@@ -1500,7 +1502,7 @@ lbool Solver::search(int nof_conflicts) {
 #endif
 			}
 #endif
-
+*/
             if(verbosity >= 1 && starts>0 && conflicts % verbEveryConflicts == 0) {
                 printf("c | %8d   %7d    %5d | %7d %8d %8d | %5d %8d   %6d %8d | %6.3f %% |\n",
                        (int) starts, (int) stats[nbstopsrestarts], (int) (conflicts / starts),
@@ -1544,6 +1546,20 @@ lbool Solver::search(int nof_conflicts) {
             if(certifiedUNSAT)
                 addToDrat(learnt_clause, true);
 
+			// RKB: bump global variable learnt clause count
+#ifdef RKB
+			for (int i = 0; i < learnt_clause.size(); ++i) {
+				learnt_var_count[var(learnt_clause[i])]++;
+			}
+			if (conflicts % refocus_time == 0) {
+				for (int i = 0; i < learnt_var_count.size(); ++i) {
+					varBumpActivity(i,learnt_var_count[i]*var_inc);
+				}
+#ifdef RKB_MULT
+				refocus_time <<= 1;
+#endif
+			}
+#endif
 
 
             if(learnt_clause.size() == 1) {
