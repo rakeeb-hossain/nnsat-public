@@ -55,9 +55,6 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 #include "core/Constants.h"
 #include"simp/SimpSolver.h"
 
-#define RKB 1
-#define RKB_MULT 1
-
 using namespace Glucose;
 
 
@@ -121,6 +118,13 @@ static BoolOption opt_fixed_randomize_phase_on_restarts(_cat, "fix-phas-rest", "
 static BoolOption opt_adapt(_cat, "adapt", "Adapt dynamically stategies after 100000 conflicts", true);
 
 static BoolOption opt_forceunsat(_cat,"forceunsat","Force the phase for UNSAT",true);
+
+static IntOption     opt_refocus_method     (_cat, "refocus-method", "Refocusing method (0=None, 1=RKBGlucose, 2=RKBGlucose_mult)", 0, IntRange(0, 2));
+static IntOption     opt_refocus_time     (_cat, "refocus-time", "Refocusing time", 100, IntRange(0, 10000));
+// static IntOption     opt_activity_init_method     (_cat, "act-init", "Activity initialization method (0=All-zero,     1=Bayesian-Moment-Matching, 2=Jeroslow-Wang, 3=Random, 4=DIST, 5=Survey-Propagation)", 0, IntRange(0, 5));
+// static IntOption     opt_init_epochs              (_cat, "init-epochs", "Initial number of Epochs for learning polarity/activity weights", 10, IntRange(0, 1000));
+// static IntOption     opt_update_epochs            (_cat, "update-epochs", "Number of Epochs for updating polarity/activity weights using a conflict clause", 1, IntRange(0, 1000));
+
 //=================================================================================================
 // Constructor/Destructor:
 
@@ -200,7 +204,8 @@ verbosity(0)
 , nbUnsatCalls(0)
         // simplify
 , performLCM(1)
-, refocus_time(100)		// RKB
+, refocus_time(opt_refocus_time)		// RKB
+, refocus_method(opt_refocus_method)
 {
     MYFLAG = 0;
     // Initialize only first time. Useful for incremental solving (not in // version), useless otherwise
@@ -290,6 +295,7 @@ Solver::Solver(const Solver &s) :
 , nbUnsatCalls(s.nbUnsatCalls)
 , performLCM(s.performLCM)
 , refocus_time(s.refocus_time) // RKB
+, refocus_method(s.refocus_method) // RKB
 {
     // Copy clauses.
     s.ca.copyTo(ca);
@@ -1547,19 +1553,17 @@ lbool Solver::search(int nof_conflicts) {
                 addToDrat(learnt_clause, true);
 
 			// RKB: bump global variable learnt clause count
-#ifdef RKB
-			for (int i = 0; i < learnt_clause.size(); ++i) {
-				learnt_var_count[var(learnt_clause[i])]++;
+			if (refocus_method >= 1) {
+					for (int i = 0; i < learnt_clause.size(); ++i) {
+						learnt_var_count[var(learnt_clause[i])]++;
+					}
+					if (conflicts % refocus_time == 0) {
+						for (int i = 0; i < learnt_var_count.size(); ++i) {
+							varBumpActivity(i,learnt_var_count[i]*var_inc);
+						}
+						//if (refocus_method == 2) refocus_time <<= 1;
+					}
 			}
-			if (conflicts % refocus_time == 0) {
-				for (int i = 0; i < learnt_var_count.size(); ++i) {
-					varBumpActivity(i,learnt_var_count[i]*var_inc);
-				}
-#ifdef RKB_MULT
-				refocus_time <<= 1;
-#endif
-			}
-#endif
 
 
             if(learnt_clause.size() == 1) {

@@ -362,6 +362,7 @@ protected:
 	// RKB state:
 	vec<unsigned int>		 	learnt_var_count;
 	long long refocus_time;
+	int refocus_method;
 
     // UPDATEVARACTIVITY trick (see competition'09 companion paper)
     vec<Lit> lastDecisionLevel;
